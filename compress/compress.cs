@@ -4,7 +4,6 @@ public class Compress
 {
     private class HuffmannCode
     {
-        //construct huffmann code
         
         
     }
@@ -24,7 +23,6 @@ public class Compress
             foreach (var files in dataFiles)
             {
                 txtFiles[i] = files;
-                i++;
                 i++;
             }
         }
