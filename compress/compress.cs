@@ -2,7 +2,6 @@
 
 public class HuffmannCode
 {
-    //Count characters in string and return sorted dictionary containing the character and frequency count
     protected IDictionary<char, int> CountCharacters(string text)
     {
         IDictionary<char, int> charCount = new Dictionary<char, int>();
@@ -21,6 +20,35 @@ public class HuffmannCode
             .ToDictionary(entry => entry.Key, entry => entry.Value);
         
         return finalCharCount;
+    }
+}
+
+public class Node
+{
+    public char Symbol { get; set; }
+    public int Weight { get; set; }
+
+    public class InternalNode : Node
+    {
+        public InternalNode(Node? parentNode, List<Node?> childNotes)
+        {
+            parentNode = parentNode;
+            childNotes = childNotes;
+        }
+
+        private Node? parentNode;
+        private List<Node?> childNotes;
+    }
+
+    public class LeafNode : Node
+    {
+        public LeafNode(Node? parentNode)
+        {
+            parentNode = parentNode;
+        }
+        
+        private Node? parentNode;
+        
     }
 }
 
@@ -62,6 +90,10 @@ public class Compress : HuffmannCode
                 foreach (var line in lines)
                 {
                     var charCount = CountCharacters(line);
+                    foreach (var character in charCount)         
+                    {
+                        Console.WriteLine(character);
+                    }
                 }
 
             }
