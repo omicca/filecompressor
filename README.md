@@ -1,3 +1,6 @@
-# filecompressor
+# File Compressor
 <br></br>
-*edit path to fit your directory structure (compress.cs)
+Compresses and decompresses text files and images using Huffmann Coding. 
+
+TBA:
+.zip support
