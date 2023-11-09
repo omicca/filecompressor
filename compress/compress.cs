@@ -1,13 +1,31 @@
-﻿namespace FileCompressor;
+﻿namespace FileCompressor.compress;
 
-public class Compress
+public class HuffmannCode
 {
-    private class HuffmannCode
+    //Count characters in string and return sorted dictionary containing the character and frequency count
+    protected IDictionary<char, int> CountCharacters(string text)
     {
+        IDictionary<char, int> charCount = new Dictionary<char, int>();
+        foreach (var character in text)
+        {
+            if (charCount.ContainsKey(character))
+            {
+                charCount[character]++;
+            }
+            else
+            {
+                charCount.Add(character, 1);
+            }
+        }
+        var finalCharCount = charCount.OrderBy(entry => entry.Value)
+            .ToDictionary(entry => entry.Key, entry => entry.Value);
         
-        
+        return finalCharCount;
     }
-     
+}
+
+public class Compress : HuffmannCode
+{
     public string[] ReadFile()
     {
         string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -41,11 +59,11 @@ public class Compress
             try
             {
                 string[] lines = File.ReadAllLines(file);
-                 
                 foreach (var line in lines)
                 {
-                    Console.WriteLine(line);
+                    var charCount = CountCharacters(line);
                 }
+
             }
             catch (IOException e)
             {
@@ -56,5 +74,10 @@ public class Compress
         {
             Console.WriteLine("File does not exist.");
         }
+    }
+
+    public void CompressImage()
+    {
+        
     }
 }

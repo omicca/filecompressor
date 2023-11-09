@@ -1,11 +1,9 @@
-﻿using System.Threading.Channels;
-using FileCompressor;
+﻿using FileCompressor.compress;
 
-Compress comp = new Compress();
+var comp = new Compress();
 
-string[] files = comp.ReadFile();
+var files = comp.ReadFile();
 
-foreach (var file in files)
-{
-    comp.CompressTextFile(file);
-}
+var file = files[1];
+
+comp.CompressTextFile(file);
