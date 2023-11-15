@@ -21,36 +21,25 @@ public class HuffmannCode
         
         return finalCharCount;
     }
-}
 
-public class Node
-{
-    public char Symbol { get; set; }
-    public int Weight { get; set; }
-
-    public class InternalNode : Node
+    protected List<Node.LeafNode> CreateLeafNodes(IDictionary<char, int> nodes)
     {
-        public InternalNode(Node? parentNode, List<Node?> childNotes)
+        List<Node.LeafNode> leafNodes = new List<Node.LeafNode>();
+        foreach (var node in nodes)
         {
-            parentNode = parentNode;
-            childNotes = childNotes;
+            Node.LeafNode newNode = new Node.LeafNode(null);
+            newNode.Symbol = node.Key;
+            newNode.Weight = node.Value;
+            leafNodes.Add(newNode);
         }
 
-        private Node? parentNode;
-        private List<Node?> childNotes;
+        return leafNodes;
     }
+    
+    
 
-    public class LeafNode : Node
-    {
-        public LeafNode(Node? parentNode)
-        {
-            parentNode = parentNode;
-        }
-        
-        private Node? parentNode;
-        
-    }
 }
+
 
 public class Compress : HuffmannCode
 {
@@ -87,15 +76,14 @@ public class Compress : HuffmannCode
             try
             {
                 string[] lines = File.ReadAllLines(file);
+                IDictionary<char, int> charCount = null;
                 foreach (var line in lines)
                 {
-                    var charCount = CountCharacters(line);
-                    foreach (var character in charCount)         
-                    {
-                        Console.WriteLine(character);
-                    }
+                    charCount = CountCharacters(line);
                 }
-
+                var leafNodes = CreateLeafNodes(charCount);
+                
+                
             }
             catch (IOException e)
             {
