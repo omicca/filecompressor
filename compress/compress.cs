@@ -22,22 +22,49 @@ public class HuffmannCode
         return finalCharCount;
     }
 
-    protected List<Node.LeafNode> CreateLeafNodes(IDictionary<char, int> nodes)
+    protected List<Node.LeafNode> CreateLeafNodes(IDictionary<char, int> sets)
     {
         List<Node.LeafNode> leafNodes = new List<Node.LeafNode>();
-        foreach (var node in nodes)
+        foreach (var node in sets)
         {
-            Node.LeafNode newNode = new Node.LeafNode(null);
-            newNode.Symbol = node.Key;
-            newNode.Weight = node.Value;
+            Node.LeafNode newNode = new Node.LeafNode(null)
+            {
+                Symbol = node.Key,
+                Weight = node.Value
+            };
             leafNodes.Add(newNode);
         }
 
         return leafNodes;
     }
     
-    
+    protected void BuildPriorityQueue(List<Node.LeafNode> nodes)
+    {
+        nodes.Sort();
+    }
 
+    protected void BuildTree(List<Node.LeafNode> leafNodes)
+    {
+        List<Node.InternalNode> interNodes = new List<Node.InternalNode>();
+        while (leafNodes.Count > 0)
+        {
+            if (leafNodes.Count == 1)
+            {
+                Console.WriteLine($"Last element: {leafNodes[0]}");
+            }
+            else
+            {
+                List<Node.LeafNode> removedNodes = leafNodes.GetRange(0, 1);
+                leafNodes.RemoveRange(0,1);
+                var nodeSum = removedNodes[0].Weight + removedNodes[1].Weight;
+                Node.InternalNode newInternalNode = new Node.InternalNode(null, removedNodes.Cast<Node>().ToList());
+                newInternalNode.Weight = nodeSum;
+                
+                interNodes.Add(newInternalNode);
+            }
+        }
+    }
+    
 }
 
 
@@ -83,7 +110,6 @@ public class Compress : HuffmannCode
                 }
                 var leafNodes = CreateLeafNodes(charCount);
                 
-                
             }
             catch (IOException e)
             {
@@ -101,3 +127,4 @@ public class Compress : HuffmannCode
         
     }
 }
+
