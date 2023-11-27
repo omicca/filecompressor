@@ -30,7 +30,7 @@ public class HuffmannCode
         List<Node> leafNodes = new List<Node>();
         foreach (var node in charSets)
         {
-            Node newNode = new Node(null)
+            Node newNode = new Node(node.Key, node.Value)
             {
                 Symbol = node.Key,
                 Weight = node.Value
@@ -46,37 +46,11 @@ public class HuffmannCode
         nodes.Sort();
     }
 
-    protected void BuildTree(List<Node> leafNodes)
+    protected HuffmannTree BuildTree(List<Node> leafNodes)
     {
-        List<Node> interNodes = new List<Node>();
-        while (leafNodes.Count > 1)
-        {
-            List<Node> removedNodes = leafNodes.GetRange(0, 2);
-            leafNodes.RemoveRange(0, 2);
-            var nodeSum = removedNodes[0].Weight + removedNodes[1].Weight;
-
-            Node newInternalNode = new Node(null, removedNodes.Cast<Node>().ToList())
-            {
-                Symbol = (char)4,
-                Weight = nodeSum
-            };
-
-            interNodes.Add(newInternalNode);
-        }
-        
-        if (leafNodes.Count == 1)
-        {
-            Node rootNode = new Node(interNodes);
-            Console.WriteLine(rootNode.Weight);
-        }
-
-        foreach (var node in interNodes)
-        {
-            Console.WriteLine($"Internal nodes: {node.Symbol} - {node.Weight}");
-            node.PrintChildNodes();
-        }
+        HuffmannTree huff = new HuffmannTree(leafNodes);
+        return huff;
     }
-
 }
 
 
@@ -129,7 +103,9 @@ public class Compress : HuffmannCode
                 {
                     var leafNodes = CreateLeafNodes(charCount);
                 
-                    List<Node> finalTree = BuildTree(leafNodes);
+                    HuffmannTree finalTree = BuildTree(leafNodes);
+                    Console.BufferHeight = 5000;
+                    BTreePrinter.Print(finalTree.Root);
                 }
             }
             catch (IOException e)
