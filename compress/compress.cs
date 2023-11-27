@@ -1,4 +1,7 @@
-﻿namespace FileCompressor.compress;
+﻿using System.Threading.Channels;
+using FileCompressor.Compress;
+
+namespace FileCompressor.compress;
 
 public class HuffmannCode
 {
@@ -22,12 +25,12 @@ public class HuffmannCode
         return finalCharCount;
     }
 
-    protected List<Node.LeafNode> CreateLeafNodes(IDictionary<char, int> sets)
+    protected List<Node> CreateLeafNodes(IDictionary<char, int> charSets)
     {
-        List<Node.LeafNode> leafNodes = new List<Node.LeafNode>();
-        foreach (var node in sets)
+        List<Node> leafNodes = new List<Node>();
+        foreach (var node in charSets)
         {
-            Node.LeafNode newNode = new Node.LeafNode(null)
+            Node newNode = new Node(null)
             {
                 Symbol = node.Key,
                 Weight = node.Value
@@ -38,33 +41,42 @@ public class HuffmannCode
         return leafNodes;
     }
     
-    protected void BuildPriorityQueue(List<Node.LeafNode> nodes)
+    protected void BuildPriorityQueue(List<Node> nodes)
     {
         nodes.Sort();
     }
 
-    protected void BuildTree(List<Node.LeafNode> leafNodes)
+    protected void BuildTree(List<Node> leafNodes)
     {
-        List<Node.InternalNode> interNodes = new List<Node.InternalNode>();
-        while (leafNodes.Count > 0)
+        List<Node> interNodes = new List<Node>();
+        while (leafNodes.Count > 1)
         {
-            if (leafNodes.Count == 1)
+            List<Node> removedNodes = leafNodes.GetRange(0, 2);
+            leafNodes.RemoveRange(0, 2);
+            var nodeSum = removedNodes[0].Weight + removedNodes[1].Weight;
+
+            Node newInternalNode = new Node(null, removedNodes.Cast<Node>().ToList())
             {
-                Console.WriteLine($"Last element: {leafNodes[0]}");
-            }
-            else
-            {
-                List<Node.LeafNode> removedNodes = leafNodes.GetRange(0, 1);
-                leafNodes.RemoveRange(0,1);
-                var nodeSum = removedNodes[0].Weight + removedNodes[1].Weight;
-                Node.InternalNode newInternalNode = new Node.InternalNode(null, removedNodes.Cast<Node>().ToList());
-                newInternalNode.Weight = nodeSum;
-                
-                interNodes.Add(newInternalNode);
-            }
+                Symbol = (char)4,
+                Weight = nodeSum
+            };
+
+            interNodes.Add(newInternalNode);
+        }
+        
+        if (leafNodes.Count == 1)
+        {
+            Node rootNode = new Node(interNodes);
+            Console.WriteLine(rootNode.Weight);
+        }
+
+        foreach (var node in interNodes)
+        {
+            Console.WriteLine($"Internal nodes: {node.Symbol} - {node.Weight}");
+            node.PrintChildNodes();
         }
     }
-    
+
 }
 
 
@@ -107,9 +119,18 @@ public class Compress : HuffmannCode
                 foreach (var line in lines)
                 {
                     charCount = CountCharacters(line);
+                    foreach (var node in charCount)
+                    {
+                        Console.WriteLine(node);
+                    }
                 }
-                var leafNodes = CreateLeafNodes(charCount);
+
+                if (charCount != null)
+                {
+                    var leafNodes = CreateLeafNodes(charCount);
                 
+                    List<Node> finalTree = BuildTree(leafNodes);
+                }
             }
             catch (IOException e)
             {

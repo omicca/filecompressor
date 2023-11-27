@@ -1,55 +1,63 @@
-using System.Diagnostics;
+using System;
+using System.Collections.Generic;
 
-namespace FileCompressor.compress;
-
-public class Node
+namespace FileCompressor.Compress
 {
-    public char Symbol { get; set; }
-    public int Weight { get; set; }
-
-    public class InternalNode : Node
+    public class Node : IComparable<Node>
     {
-        public InternalNode(Node? parentNode, List<Node> childNotes)
+        public char Symbol { get; set; }
+        public int Weight { get; set; }
+        public Node? Left { get; set; }
+        public Node? Right { get; set; }
+
+        public Node(char symbol, int weight)
         {
-            ParentNode = parentNode;
-            ChildNotes = childNotes;
+            Symbol = symbol;
+            Weight = weight;
         }
 
-        private Node? ParentNode { get; set; }
-        public List<Node> ChildNotes { get; private set; }
-
-        public void SetParent()
+        public Node(int weight, Node? left, Node? right)
         {
-            
+            Weight = weight;
+            Left = left;
+            Right = right;
         }
 
-        public void SetChildNodes(List<Node> nodes)
+        public int CompareTo(Node other)
         {
-            ChildNotes = nodes;
+            return Weight.CompareTo(other.Weight);
         }
 
-    }
-
-    public class LeafNode : Node, IComparable<LeafNode>
-    {
-        public LeafNode(Node? parentNode)
+        public void PrintNode()
         {
-            ParentNode = parentNode;
-        }
-
-        public Node? ParentNode { get; private set; }
-
-        public int CompareTo(LeafNode? other)
-        {
-            return this.Weight.CompareTo(other.Weight);
+            Console.WriteLine($"Symbol: {Symbol}, Weight: {Weight}");
         }
     }
 
-    public void PrintLeafNodes(List<LeafNode> leafNodes)
+    public class HuffmanTree
     {
-        foreach (var node in leafNodes)
+        public Node? Root { get; set; }
+
+        public HuffmanTree(List<Node?> nodes)
         {
-            Console.WriteLine($"Symbol: {node.Symbol} || Weight: {node.Weight}\n");
+            BuildTree(nodes);
+        }
+
+        private void BuildTree(List<Node?> nodes)
+        {
+            while (nodes.Count > 1)
+            {
+                nodes.Sort();
+                var left = nodes[0];
+                var right = nodes[1];
+                nodes.Remove(left);
+                nodes.Remove(right);
+
+                var parent = new Node(left.Weight + right.Weight, left, right);
+                nodes.Add(parent);
+            }
+
+            Root = nodes[0];
         }
     }
 }
