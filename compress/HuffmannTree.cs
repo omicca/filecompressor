@@ -65,7 +65,7 @@ namespace FileCompressor.Compress
 
 public static class BTreePrinter
 {
-    public static void Print(this Node root, string textFormat = "0", int spacing = 1, int topMargin = 2, int leftMargin = 2)
+    public static void Print(this Node root, int spacing = 1, int topMargin = 2, int leftMargin = 2)
     {
         if (root == null) return;
         int rootTop = Console.CursorTop + topMargin;
@@ -73,7 +73,7 @@ public static class BTreePrinter
         var next = root;
         for (int level = 0; next != null; level++)
         {
-            var item = new NodeInfo { Node = next, Text = next.Weight.ToString(textFormat) };
+            var item = new NodeInfo { Node = next, Text = GetNodeText(next) };
             if (level < last.Count)
             {
                 item.StartPos = last[level].EndPos + spacing;
@@ -129,6 +129,18 @@ public static class BTreePrinter
             }
         }
         Console.SetCursorPosition(0, rootTop + 2 * last.Count - 1);
+    }
+
+    private static string GetNodeText(Node node)
+    {
+        if (node.Left == null && node.Right == null) // Leaf node
+        {
+            return node.Symbol.ToString(); // Use the symbol for leaf nodes
+        }
+        else
+        {
+            return node.Weight.ToString(); // Use the weight for internal nodes
+        }
     }
 
     private static void Print(string s, int top, int left, int right = -1)
