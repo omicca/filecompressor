@@ -1,6 +1,7 @@
 # File Compressor
 <br></br>
-Compresses and decompresses text files and images using Huffmann Coding. 
+- Compress/decompress files (text/images)
+- Draw tree
 
-TBA:
+To be added:
 .zip support
