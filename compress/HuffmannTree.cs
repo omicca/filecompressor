@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using FileCompressor.Compress;
 
@@ -8,8 +9,11 @@ namespace FileCompressor.Compress
     {
         public char Symbol { get; set; }
         public int Weight { get; set; }
+        
+        public string HuffmannCode { get; set; }
         public Node? Left { get; set; }
         public Node? Right { get; set; }
+        
 
         public Node(char symbol, int weight)
         {
@@ -60,12 +64,29 @@ namespace FileCompressor.Compress
 
             Root = nodes[0];
         }
+
+        public void TraverseTree(Node? node, string code, Dictionary<char, string> huffmannCodes)
+        {
+            while (true)
+            {
+                if (node == null) return;
+
+                if (node.Symbol != '\0')
+                {
+                    huffmannCodes[node.Symbol] = code;
+                }
+
+                TraverseTree(node.Left, code + "0", huffmannCodes);
+                node = node.Right;
+                code += "1";
+            }
+        }
     }
 }
 
-public static class BTreePrinter
+public static class HTreePrinter
 {
-    public static void Print(this Node root, int spacing = 1, int topMargin = 2, int leftMargin = 2)
+    public static void Print(this Node? root, int spacing = 1, int topMargin = 2, int leftMargin = 2)
     {
         if (root == null) return;
         int rootTop = Console.CursorTop + topMargin;
@@ -103,16 +124,11 @@ public static class BTreePrinter
             {
                 int top = rootTop + 2 * level;
                 Print(item.Text, top, item.StartPos);
-                if (item.Left != null)
-                {
-                    Print("/", top + 1, item.Left.EndPos);
-                    Print("_", top, item.Left.EndPos + 1, item.StartPos);
-                }
-                if (item.Right != null)
-                {
-                    Print("_", top, item.EndPos, item.Right.StartPos - 1);
-                    Print("\\", top + 1, item.Right.StartPos - 1);
-                }
+                Print("/", top + 1, item.Left.EndPos);
+                Print("_", top, item.Left.EndPos + 1, item.StartPos);
+
+                Print("_", top, item.EndPos, item.Right.StartPos - 1);
+                Print("\\", top + 1, item.Right.StartPos - 1);
                 if (--level < 0) break;
                 if (item == item.Parent.Left)
                 {
@@ -121,10 +137,7 @@ public static class BTreePrinter
                 }
                 else
                 {
-                    if (item.Parent.Left == null)
-                        item.Parent.EndPos = item.StartPos - 1;
-                    else
-                        item.Parent.StartPos += (item.StartPos - 1 - item.Parent.EndPos) / 2;
+                    item.Parent.StartPos += (item.StartPos - 1 - item.Parent.EndPos) / 2;
                 }
             }
         }
