@@ -57,6 +57,7 @@ public class HuffmannCode
     }
 }
 
+public delegate string[] ReadOutputFolder(int choice);
 
 public class Compress : HuffmannCode
 {
@@ -64,28 +65,57 @@ public class Compress : HuffmannCode
     string inputPath = Path.Combine(currentDirectory, @"..\..\..\input\");
     string outputPath = Path.Combine(currentDirectory, @"..\..\..\output\");
     
-    public string[] ReadFile()
+    public string[] ReadFile(int choice)
     {
-        string fullPath = Path.GetFullPath(inputPath);
-
-        string[] txtFiles = new string[2];
-        try
+        string[] test = new string[2];
+        if (choice == 0)
         {
-            var dataFiles = Directory.EnumerateFiles(fullPath, "*.txt", SearchOption.TopDirectoryOnly);
+            string fullPath = Path.GetFullPath(inputPath);
 
-            int i = 0;
-            foreach (var files in dataFiles)
+            string[] txtFiles = new string[2];
+            try
             {
-                txtFiles[i] = files;
-                i++;
+                var dataFiles = Directory.EnumerateFiles(fullPath, "*.txt", SearchOption.TopDirectoryOnly);
+
+                int i = 0;
+                foreach (var files in dataFiles)
+                {
+                    txtFiles[i] = files;
+                    i++;
+                }
             }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            return txtFiles;
         }
 
-        return txtFiles;
+        if (choice == 1)
+        {
+            string fullPath = Path.GetFullPath(outputPath);
+            string[] binFiles = new string[2];
+            try
+            {
+                var dataFiles = Directory.EnumerateFiles(fullPath, "*.bin", SearchOption.TopDirectoryOnly);
+
+                int i = 0;
+                foreach (var files in dataFiles)
+                {
+                    binFiles[i] = files;
+                    i++;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            return binFiles;
+        }
+
+        return test;
     }
      
     public void CompressTextFile(string file)
@@ -128,6 +158,9 @@ public class Compress : HuffmannCode
                     
                     string outputFile = Path.Combine(outputPath, "compressed.bin");
                     File.WriteAllBytes(outputFile, bytes);
+
+                    Decompress decompress = new Decompress();
+                    decompress.DecompressFile(finalTree, ReadFile);
                 }
             }
             catch (IOException e)
