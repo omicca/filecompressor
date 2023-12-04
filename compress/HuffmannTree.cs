@@ -9,8 +9,6 @@ namespace FileCompressor.Compress
     {
         public char Symbol { get; set; }
         public int Weight { get; set; }
-        
-        public string HuffmannCode { get; set; }
         public Node? Left { get; set; }
         public Node? Right { get; set; }
         

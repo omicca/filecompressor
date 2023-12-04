@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Reflection.Metadata.Ecma335;
+using System.Text;
 using System.Threading.Channels;
 using FileCompressor.Compress;
 
@@ -58,6 +59,7 @@ public class HuffmannCode
 }
 
 public delegate string[] ReadOutputFolder(int choice);
+public delegate byte[] StringToByte(string str);
 
 public class Compress : HuffmannCode
 {
@@ -149,18 +151,15 @@ public class Compress : HuffmannCode
                         }
                     }
 
-                    int numOfBytes = bitString.Length / 8;
-                    byte[] bytes = new byte[numOfBytes];
-                    for (int i = 0; i < numOfBytes; i++)
+                    Console.WriteLine(bitString);
+
+                    using (BinaryWriter writer = new BinaryWriter(File.Open(outputPath + "compressed.bin", FileMode.Create)))
                     {
-                        bytes[i] = Convert.ToByte(bitString.Substring(8 * i, 8), 2);
+                        writer.Write(bitString);
                     }
-                    
-                    string outputFile = Path.Combine(outputPath, "compressed.bin");
-                    File.WriteAllBytes(outputFile, bytes);
 
                     Decompress decompress = new Decompress();
-                    decompress.DecompressFile(finalTree, ReadFile);
+                    decompress.DecompressFile(finalTree, ReadFile, outputPath);
                 }
             }
             catch (IOException e)
@@ -172,6 +171,27 @@ public class Compress : HuffmannCode
         {
             Console.WriteLine("File does not exist.");
         }
+    }
+    
+    byte[] StringToBytesArray(string str)
+    {
+        var bitsToPad = 8 - str.Length % 8;
+
+        if (bitsToPad != 8)
+        {
+            var neededLength = bitsToPad + str.Length;
+            str = str.PadLeft(neededLength, '0');
+        }
+
+        int size= str.Length / 8;
+        byte[] arr = new byte[size];
+
+        for (int a = 0; a < size; a++)
+        {
+            arr[a] = Convert.ToByte(str.Substring(a * 8, 8), 2);
+        }
+
+        return arr;
     }
 
     public void CompressImage()

@@ -5,16 +5,16 @@ namespace FileCompressor;
 
 public class Decompress
 {
-    public void DecompressFile(HuffmannTree tree, ReadOutputFolder fileRead)
+    public void DecompressFile(HuffmannTree tree, ReadOutputFolder fileRead, string path)
     {
-        string[] outputs = fileRead(1);
+        string val = "";
+            using (BinaryReader reader = new BinaryReader(File.Open(path + "compressed.bin", FileMode.Open)))
+            {
+                val = reader.ReadString();
+            }
 
-        foreach (var file in outputs)
-        {
-            byte[] binaryData = File.ReadAllBytes(file);
-            string binaryString = string.Join("", binaryData.Select(b => Convert.ToString(b, 2).PadLeft(0, '0')));
-            Console.WriteLine($"Binary data: {binaryString}");
-        }
+            Console.WriteLine(val);
+            Console.ReadLine();
+        
     }
-
 }
