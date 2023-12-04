@@ -172,27 +172,6 @@ public class Compress : HuffmannCode
             Console.WriteLine("File does not exist.");
         }
     }
-    
-    byte[] StringToBytesArray(string str)
-    {
-        var bitsToPad = 8 - str.Length % 8;
-
-        if (bitsToPad != 8)
-        {
-            var neededLength = bitsToPad + str.Length;
-            str = str.PadLeft(neededLength, '0');
-        }
-
-        int size= str.Length / 8;
-        byte[] arr = new byte[size];
-
-        for (int a = 0; a < size; a++)
-        {
-            arr[a] = Convert.ToByte(str.Substring(a * 8, 8), 2);
-        }
-
-        return arr;
-    }
 
     public void CompressImage()
     {

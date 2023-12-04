@@ -11,12 +11,13 @@ namespace FileCompressor.Compress
         public int Weight { get; set; }
         public Node? Left { get; set; }
         public Node? Right { get; set; }
-        
+        public bool IsLeaf { get; set; }
 
         public Node(char symbol, int weight)
         {
             Symbol = symbol;
             Weight = weight;
+            IsLeaf = true;
         }
 
         public Node(int weight, Node? left, Node? right)

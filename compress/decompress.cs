@@ -7,14 +7,34 @@ public class Decompress
 {
     public void DecompressFile(HuffmannTree tree, ReadOutputFolder fileRead, string path)
     {
-        string val = "";
-            using (BinaryReader reader = new BinaryReader(File.Open(path + "compressed.bin", FileMode.Open)))
+        Node? currentNode = tree.Root;
+        string binaryString = "", decodedString = "";
+        using (BinaryReader reader = new BinaryReader(File.Open(path + "compressed.bin", FileMode.Open)))
+        {
+            binaryString = reader.ReadString();
+        }
+
+        foreach (var bit in binaryString)
+        {
+            if (bit == '0')
             {
-                val = reader.ReadString();
+                currentNode = currentNode?.Left;
+            }
+            else if (bit == '1')
+            {
+                currentNode = currentNode?.Right;
             }
 
-            Console.WriteLine(val);
-            Console.ReadLine();
+            if (currentNode != null && currentNode.IsLeaf)
+            {
+                decodedString += currentNode.Symbol;
+                currentNode = tree.Root;
+            }
+        }
+
+        Console.WriteLine(decodedString);
+        
+        Console.ReadLine();
         
     }
 }
