@@ -1,26 +1,24 @@
-﻿using System.Net;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Channels;
-using FileCompressor.Compress;
+﻿using FileCompressor.Compress;
 using System.Drawing;
+using System.Text;
 
 namespace FileCompressor.compress;
 
 public class HuffmannCode
 {
-    protected Dictionary<char, int> CountCharacters(string text)
+    protected Dictionary<string, int> CountCharacters(string text)
     {
-        Dictionary<char, int> charCount = new Dictionary<char, int>();
+        Dictionary<string, int> charCount = new Dictionary<string, int>();
         foreach (var character in text)
         {
-            if (charCount.ContainsKey(character))
+            string charKey = character.ToString();
+            if (charCount.ContainsKey(charKey))
             {
-                charCount[character]++;
+                charCount[charKey]++;
             }
             else
             {
-                charCount.Add(character, 1);
+                charCount.Add(charKey, 1);
             }
         }
         var finalCharCount = charCount.OrderBy(entry => entry.Value)
@@ -29,15 +27,15 @@ public class HuffmannCode
         return finalCharCount;
     }
 
-    protected List<Node> CreateLeafNodes(Dictionary<char, int> charSets)
+    protected List<Node> CreateLeafNodes(Dictionary<string, int> charSets)
     {
         List<Node> leafNodes = new List<Node>();
-        foreach (var node in charSets)
+        foreach (var (key, value) in charSets)
         {
-            Node newNode = new Node(node.Key, node.Value)
+            Node newNode = new Node(key, value)
             {
-                Symbol = node.Key,
-                Weight = node.Value
+                Symbol = key,
+                Weight = value
             };
             leafNodes.Add(newNode);
         }
@@ -51,9 +49,9 @@ public class HuffmannCode
         return huff;
     }
     
-    public Dictionary<char, string> GenerateHuffmannCodes(HuffmannTree tree)
+    public Dictionary<string, string> GenerateHuffmannCodes(HuffmannTree tree)
     {
-        var huffmannCodes = new Dictionary<char, string>();
+        var huffmannCodes = new Dictionary<string, string>();
         tree.TraverseTree(tree.Root, "", huffmannCodes);
         return huffmannCodes;
     }
@@ -137,7 +135,7 @@ public class Compress : HuffmannCode
             try
             {
                 string[] lines = File.ReadAllLines(file);
-                Dictionary<char, int> charCount = null;
+                Dictionary<string, int> charCount = null;
                 foreach (var line in lines)
                 {
                     charCount = CountCharacters(line);
@@ -154,7 +152,8 @@ public class Compress : HuffmannCode
                     {
                         foreach (var character in line)
                         {
-                            if (codes.TryGetValue(character, out var code))
+                            string charKey = character.ToString();
+                            if (codes.TryGetValue(charKey, out var code))
                             {
                                 bitString += code;
                             }
@@ -169,7 +168,7 @@ public class Compress : HuffmannCode
                     }
 
                     Decompress decompress = new Decompress();
-                    decompress.DecompressFile(finalTree, ReadFile, outputPath);
+                    decompress.DecompressFile(finalTree, outputPath);
                 }
             }
             catch (IOException e)
@@ -215,15 +214,35 @@ public class Compress : HuffmannCode
             Dictionary<string, int> finalFrequencies = new Dictionary<string, int>();
             foreach (var entry in pixelFrequencies)
             {
-                string pxl = entry.Key.ToString();
-                finalFrequencies[pxl] = entry.Value;
+                finalFrequencies[entry.Key.ToString()] = entry.Value;
             }
 
             var leafNodes = CreateLeafNodes(finalFrequencies);
             var huffTree = BuildTree(leafNodes);
             var codes = GenerateHuffmannCodes(huffTree);
             
+            StringBuilder encodedData = new StringBuilder();
+            foreach (var pixel in finalFrequencies)
+            {
+                if (codes.TryGetValue(pixel.Key, out var code))
+                {
+                    encodedData.Append(code);
+                }
+                else
+                {
+                    return;
+                }
+            }
 
+            string huff = encodedData.ToString();
+            Console.WriteLine(huff);
+
+            using BinaryWriter writer = new BinaryWriter(File.Open(outputPath + "compressed-image.bin", FileMode.Create));
+            writer.Write(encodedData.ToString());
+            writer.Close();
+            
+            Decompress decompress = new Decompress();
+            decompress.DecompressFile(huffTree, outputPath);
         }
     }
 }

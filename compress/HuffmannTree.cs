@@ -7,13 +7,13 @@ namespace FileCompressor.Compress
 {
     public class Node : IComparable<Node>
     {
-        public char Symbol { get; set; }
+        public string Symbol { get; set; }
         public int Weight { get; set; }
         public Node? Left { get; set; }
         public Node? Right { get; set; }
         public bool IsLeaf { get; set; }
 
-        public Node(char symbol, int weight)
+        public Node(string symbol, int weight)
         {
             Symbol = symbol;
             Weight = weight;
@@ -26,6 +26,11 @@ namespace FileCompressor.Compress
             Left = left;
             Right = right;
             IsLeaf = false;
+        }
+
+        public Node(object nodeKey, int nodeValue)
+        {
+            throw new NotImplementedException();
         }
 
         public int CompareTo(Node other)
@@ -65,13 +70,13 @@ namespace FileCompressor.Compress
             Root = nodes[0];
         }
 
-        public void TraverseTree(Node? node, string code, Dictionary<char, string> huffmannCodes)
+        public void TraverseTree(Node? node, string code, Dictionary<string, string> huffmannCodes)
         {
             while (true)
             {
                 if (node == null) return;
 
-                if (node.Symbol != '\0')
+                if (!string.IsNullOrEmpty(node.Symbol) && node.Symbol != "\0")
                 {
                     huffmannCodes[node.Symbol] = code;
                 }

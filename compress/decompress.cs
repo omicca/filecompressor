@@ -5,11 +5,11 @@ namespace FileCompressor;
 
 public class Decompress
 {
-    public void DecompressFile(HuffmannTree tree, ReadOutputFolder fileRead, string path)
+    public void DecompressFile(HuffmannTree tree, string path)
     {
         Node? currentNode = tree.Root;
         string binaryString = "", decodedString = "";
-        using (BinaryReader reader = new BinaryReader(File.Open(path + "compressed.bin", FileMode.Open)))
+        using (BinaryReader reader = new BinaryReader(File.Open(path + "compressed-image.bin", FileMode.Open)))
         {
             binaryString = reader.ReadString();
         }
