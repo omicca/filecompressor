@@ -3,14 +3,15 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Channels;
 using FileCompressor.Compress;
+using System.Drawing;
 
 namespace FileCompressor.compress;
 
 public class HuffmannCode
 {
-    protected IDictionary<char, int> CountCharacters(string text)
+    protected Dictionary<char, int> CountCharacters(string text)
     {
-        IDictionary<char, int> charCount = new Dictionary<char, int>();
+        Dictionary<char, int> charCount = new Dictionary<char, int>();
         foreach (var character in text)
         {
             if (charCount.ContainsKey(character))
@@ -28,7 +29,7 @@ public class HuffmannCode
         return finalCharCount;
     }
 
-    protected List<Node> CreateLeafNodes(IDictionary<char, int> charSets)
+    protected List<Node> CreateLeafNodes(Dictionary<char, int> charSets)
     {
         List<Node> leafNodes = new List<Node>();
         foreach (var node in charSets)
@@ -136,7 +137,7 @@ public class Compress : HuffmannCode
             try
             {
                 string[] lines = File.ReadAllLines(file);
-                IDictionary<char, int> charCount = null;
+                Dictionary<char, int> charCount = null;
                 foreach (var line in lines)
                 {
                     charCount = CountCharacters(line);
@@ -182,10 +183,49 @@ public class Compress : HuffmannCode
         }
     }
 
-    public void CompressImage()
+    public void CompressImage(string file)
     {
-        
-        
-        
+        if (File.Exists(file))
+        {
+            Bitmap bm = new Bitmap(file);
+
+            Dictionary<int, int> pixelFrequencies = new Dictionary<int, int>();
+
+            for (int i = 0; i < bm.Height; i++)
+            {
+                for (int j = 0; j < bm.Width; j++)
+                {
+                    if (j >= 0 && j < bm.Width && i >= 0 && i < bm.Height)
+                    {
+                        Color pixelColor = bm.GetPixel(j, i);
+                        int pixelValue = pixelColor.R;
+                        
+                        if (pixelFrequencies.ContainsKey(pixelValue))
+                        {
+                            pixelFrequencies[pixelValue]++;
+                        }
+                        else
+                        {
+                            pixelFrequencies[pixelValue] = 1;
+                        }
+                    }
+                }
+            }
+
+            Dictionary<string, int> finalFrequencies = new Dictionary<string, int>();
+            foreach (var entry in pixelFrequencies)
+            {
+                string pxl = entry.Key.ToString();
+                finalFrequencies[pxl] = entry.Value;
+            }
+
+            var leafNodes = CreateLeafNodes(finalFrequencies);
+            var huffTree = BuildTree(leafNodes);
+            var codes = GenerateHuffmannCodes(huffTree);
+            
+
+        }
     }
 }
+
+

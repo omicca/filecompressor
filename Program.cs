@@ -10,6 +10,6 @@ foreach (var filez in files)
     Console.WriteLine(filez);
 }
 
-var file = files[0];
+var file = files[2];
 
-comp.CompressText(file);
+comp.CompressImage(file);
