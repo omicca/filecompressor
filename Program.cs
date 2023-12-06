@@ -5,6 +5,11 @@ var comp = new Compress();
 
 var files = comp.ReadFile(0);
 
+foreach (var filez in files)
+{
+    Console.WriteLine(filez);
+}
+
 var file = files[0];
 
-comp.CompressTextFile(file);
+comp.CompressText(file);

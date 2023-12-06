@@ -25,6 +25,7 @@ namespace FileCompressor.Compress
             Weight = weight;
             Left = left;
             Right = right;
+            IsLeaf = false;
         }
 
         public int CompareTo(Node other)

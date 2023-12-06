@@ -69,18 +69,27 @@ public class Compress : HuffmannCode
     
     public string[] ReadFile(int choice)
     {
-        string[] test = new string[2];
+        string[] test = new string[3];
         if (choice == 0)
         {
             string fullPath = Path.GetFullPath(inputPath);
 
-            string[] txtFiles = new string[2];
+            string[] txtFiles = new string[3];
             try
             {
-                var dataFiles = Directory.EnumerateFiles(fullPath, "*.txt", SearchOption.TopDirectoryOnly);
-
+                var textFiles = Directory.EnumerateFiles(fullPath, "*.txt", SearchOption.TopDirectoryOnly);
+                var imgFiles = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.TopDirectoryOnly)
+                    .Where(file => file.ToLower().EndsWith(".jpg") ||
+                                   file.ToLower().EndsWith(".png") ||
+                                   file.ToLower().EndsWith(".jpeg"));
+                
                 int i = 0;
-                foreach (var files in dataFiles)
+                foreach (var files in textFiles)
+                {
+                    txtFiles[i] = files;
+                    i++;
+                }
+                foreach (var files in imgFiles)
                 {
                     txtFiles[i] = files;
                     i++;
@@ -120,7 +129,7 @@ public class Compress : HuffmannCode
         return test;
     }
      
-    public void CompressTextFile(string file)
+    public void CompressText(string file)
     {
         if (File.Exists(file))
         {
@@ -175,6 +184,8 @@ public class Compress : HuffmannCode
 
     public void CompressImage()
     {
+        
+        
         
     }
 }
