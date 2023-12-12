@@ -168,7 +168,7 @@ public class Compress : HuffmannCode
                     }
 
                     Decompress decompress = new Decompress();
-                    decompress.DecompressFile(finalTree, outputPath);
+                    decompress.DecompressText(finalTree, outputPath);
                 }
             }
             catch (IOException e)
@@ -235,14 +235,14 @@ public class Compress : HuffmannCode
             }
 
             string huff = encodedData.ToString();
-            Console.WriteLine(huff);
+            Console.WriteLine(huff + "\n\n");
 
             using BinaryWriter writer = new BinaryWriter(File.Open(outputPath + "compressed-image.bin", FileMode.Create));
             writer.Write(encodedData.ToString());
             writer.Close();
             
             Decompress decompress = new Decompress();
-            decompress.DecompressFile(huffTree, outputPath);
+            decompress.DecompressImage(huffTree, outputPath, bm.Height, bm.Width);
         }
     }
 }
