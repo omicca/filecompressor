@@ -6,7 +6,7 @@ namespace FileCompressor.compress;
 
 public class HuffmannCode
 {
-    protected Dictionary<string, int> CountCharacters(string text)
+    internal Dictionary<string, int> CountCharacters(string text)
     {
         Dictionary<string, int> charCount = new Dictionary<string, int>();
         foreach (var character in text)
@@ -27,7 +27,7 @@ public class HuffmannCode
         return finalCharCount;
     }
 
-    protected List<Node> CreateLeafNodes(Dictionary<string, int> charSets)
+    protected internal List<Node> CreateLeafNodes(Dictionary<string, int> charSets)
     {
         List<Node> leafNodes = new List<Node>();
         foreach (var (key, value) in charSets)
@@ -43,7 +43,7 @@ public class HuffmannCode
         return leafNodes;
     }
 
-    protected HuffmannTree BuildTree(List<Node> leafNodes)
+    protected internal HuffmannTree BuildTree(List<Node> leafNodes)
     {
         HuffmannTree huff = new HuffmannTree(leafNodes);
         return huff;
@@ -57,11 +57,10 @@ public class HuffmannCode
     }
 }
 
-public delegate string[] ReadOutputFolder(int choice);
-public delegate byte[] StringToByte(string str);
-
-public class Compress : HuffmannCode
+public class Compress
 {
+    private readonly HuffmannCode huffmannEncoder = new HuffmannCode();
+    
     static string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
     string inputPath = Path.Combine(currentDirectory, @"..\..\..\input\");
     string outputPath = Path.Combine(currentDirectory, @"..\..\..\output\");
@@ -80,7 +79,8 @@ public class Compress : HuffmannCode
                 var imgFiles = Directory.EnumerateFiles(fullPath, "*.*", SearchOption.TopDirectoryOnly)
                     .Where(file => file.ToLower().EndsWith(".jpg") ||
                                    file.ToLower().EndsWith(".png") ||
-                                   file.ToLower().EndsWith(".jpeg"));
+                                   file.ToLower().EndsWith(".jpeg") ||
+                                   file.ToLower().EndsWith(".bmp"));
                 
                 int i = 0;
                 foreach (var files in textFiles)
@@ -138,14 +138,14 @@ public class Compress : HuffmannCode
                 Dictionary<string, int> charCount = null;
                 foreach (var line in lines)
                 {
-                    charCount = CountCharacters(line);
+                    charCount = huffmannEncoder.CountCharacters(line);
                 }
 
                 if (charCount != null)
                 {
-                    var leafNodes = CreateLeafNodes(charCount);
-                    HuffmannTree finalTree = BuildTree(leafNodes);
-                    var codes = GenerateHuffmannCodes(finalTree);
+                    var leafNodes = huffmannEncoder.CreateLeafNodes(charCount);
+                    HuffmannTree finalTree = huffmannEncoder.BuildTree(leafNodes);
+                    var codes = huffmannEncoder.GenerateHuffmannCodes(finalTree);
 
                     string bitString = "";
                     foreach (var line in lines)
@@ -214,12 +214,19 @@ public class Compress : HuffmannCode
             Dictionary<string, int> finalFrequencies = new Dictionary<string, int>();
             foreach (var entry in pixelFrequencies)
             {
-                finalFrequencies[entry.Key.ToString()] = entry.Value;
+                if (finalFrequencies.ContainsKey(entry.Key.ToString()))
+                {
+                    finalFrequencies[entry.Key.ToString()]++;
+                }
+                else
+                {
+                    finalFrequencies[entry.Key.ToString()] = entry.Value;
+                }
             }
 
-            var leafNodes = CreateLeafNodes(finalFrequencies);
-            var huffTree = BuildTree(leafNodes);
-            var codes = GenerateHuffmannCodes(huffTree);
+            var leafNodes = huffmannEncoder.CreateLeafNodes(finalFrequencies);
+            var huffTree = huffmannEncoder.BuildTree(leafNodes);
+            var codes = huffmannEncoder.GenerateHuffmannCodes(huffTree);
             
             StringBuilder encodedData = new StringBuilder();
             foreach (var pixel in finalFrequencies)

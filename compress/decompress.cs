@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using FileCompressor.compress;
 using FileCompressor.Compress;
 
 namespace FileCompressor;
@@ -10,13 +9,11 @@ public class Decompress
     {
         Node? currentNode = tree.Root;
         string binaryString = "", decodedString = "";
-        using (BinaryReader reader = new BinaryReader(File.Open(path + "compressed-image.bin", FileMode.Open)))
+        using (BinaryReader reader = new BinaryReader(File.Open(path + "compressed.bin", FileMode.Open)))
         {
             binaryString = reader.ReadString();
         }
-
-        Console.WriteLine(tree.Root.Left.Left.Left.Left.Left.IsLeaf);
-
+        
         foreach (var bit in binaryString)
         {
             if (bit == '0')
@@ -49,7 +46,7 @@ public class Decompress
         {
             binaryString = reader.ReadString();
         }
-
+        
         foreach (var bit in binaryString)
         {
             if (bit == '0')
@@ -60,19 +57,22 @@ public class Decompress
             {
                 currentNode = currentNode?.Right;
             }
-            else if (currentNode != null && currentNode.IsLeaf)
+            
+            if (currentNode != null && currentNode.IsLeaf)
             {
                 decodedString += currentNode.Symbol;
                 currentNode = tree.Root;
             }
         }
+
+        Console.WriteLine(decodedString + "hey");
         ReconstructImage(decodedString, tree, height, width);
     }
 
     public void ReconstructImage(string decodedString, HuffmannTree tree, int height, int width)
     {
         Node currentNode = tree.Root;
-        Bitmap bm = new Bitmap(height, width);
+        Bitmap bm = new Bitmap(width, height);
 
         int pixelIndex = 0;
 
