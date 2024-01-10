@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using FileCompressor.Compress;
+using Newtonsoft.Json;
 
 namespace FileCompressor.Compress
 {
@@ -85,6 +86,17 @@ namespace FileCompressor.Compress
                 node = node.Right;
                 code += "1";
             }
+        }
+        public string SerializeTree()
+        {
+            string serializedTree = JsonConvert.SerializeObject(Root, Formatting.Indented);
+            return serializedTree;
+        }
+
+        public void DeserializeTree(string data)
+        { 
+            Root = JsonConvert.DeserializeObject<Node>(data);
+           
         }
     }
 }

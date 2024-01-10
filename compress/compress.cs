@@ -6,7 +6,7 @@ namespace FileCompressor.compress;
 
 public class HuffmannCode
 {
-    internal Dictionary<string, int> CountCharacters(string text)
+    protected internal Dictionary<string, int> CountCharacters(string text)
     {
         Dictionary<string, int> charCount = new Dictionary<string, int>();
         foreach (var character in text)
@@ -49,7 +49,7 @@ public class HuffmannCode
         return huff;
     }
     
-    public Dictionary<string, string> GenerateHuffmannCodes(HuffmannTree tree)
+    protected internal Dictionary<string, string> GenerateHuffmannCodes(HuffmannTree tree)
     {
         var huffmannCodes = new Dictionary<string, string>();
         tree.TraverseTree(tree.Root, "", huffmannCodes);
@@ -166,9 +166,8 @@ public class Compress
                     {
                         writer.Write(bitString);
                     }
-
-                    Decompress decompress = new Decompress();
-                    decompress.DecompressText(finalTree, outputPath);
+                    var jsonTree = finalTree.SerializeTree();
+                    File.WriteAllText(outputPath + "tree.json", jsonTree);
                 }
             }
             catch (IOException e)

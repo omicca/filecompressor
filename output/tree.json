@@ -1,0 +1,43 @@
+{
+  "Symbol": null,
+  "Weight": 5,
+  "Left": {
+    "Symbol": null,
+    "Weight": 2,
+    "Left": {
+      "Symbol": "h",
+      "Weight": 1,
+      "Left": null,
+      "Right": null,
+      "IsLeaf": true
+    },
+    "Right": {
+      "Symbol": "e",
+      "Weight": 1,
+      "Left": null,
+      "Right": null,
+      "IsLeaf": true
+    },
+    "IsLeaf": false
+  },
+  "Right": {
+    "Symbol": null,
+    "Weight": 3,
+    "Left": {
+      "Symbol": "o",
+      "Weight": 1,
+      "Left": null,
+      "Right": null,
+      "IsLeaf": true
+    },
+    "Right": {
+      "Symbol": "l",
+      "Weight": 2,
+      "Left": null,
+      "Right": null,
+      "IsLeaf": true
+    },
+    "IsLeaf": false
+  },
+  "IsLeaf": false
+}
